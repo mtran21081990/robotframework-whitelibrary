@@ -9,13 +9,12 @@ clr.AddReference(DLL_PATH)
 from System.Windows.Automation import AutomationElement, ControlType    # noqa: E402
 from TestStack.White.UIItems.Finders import SearchCriteria    # noqa: E402
 from TestStack.White.UIItems import UIItem    # noqa: E402
-from WhiteLibrary.keywords import ApplicationKeywords, KeyboardKeywords, WindowKeywords, ScreenshotKeywords, WhiteConfigurationKeywords    # noqa: E402
+from WhiteLibrary.keywords import ApplicationKeywords, KeyboardKeywords, MouseKeywords, ScreenshotKeywords, WhiteConfigurationKeywords, WindowKeywords    # noqa: E402
 from WhiteLibrary.keywords.items import (ButtonKeywords,
                                          LabelKeywords,
                                          ListKeywords,
                                          ListViewKeywords,
                                          MenuKeywords,
-                                         MouseKeywords,
                                          ProgressbarKeywords,
                                          SliderKeywords,
                                          TabKeywords,
