@@ -1,5 +1,5 @@
 *** Variables ***
-${TEST APPLICATION}      ${EXECDIR}${/}UIAutomationTest${/}bin${/}Debug${/}UIAutomationTest.exe
+${TEST APPLICATION}      ${EXECDIR}/UIAutomationTest/bin/Debug/UIAutomationTest.exe
 
 *** Settings ***
 Library    OperatingSystem
@@ -29,11 +29,17 @@ Set White Drag Step Count
     ${WHITE_DRAG_STEP_COUNT}    Get White Drag Step Count
     Should Be Equal    ${WHITE_DRAG_STEP_COUNT}    ${3}
 
+White Log Level
+    Set White Log Level    WARN
+    Set White Log Level    debug
+    Set White Log Level    iNfO
+    Run Keyword And Expect Error    ValueError: Invalid log level: 'EROR'    Set White Log Level    EROR
 
 *** Keywords ***
 White Configuration Parameters Restore
-    #These defaults are defined in White Stack source code.
+    #These defaults are defined in White source code.
     Set White Busy Timeout    5000 ms
     Set White Find Window Timeout    30000 ms
     Set White Double Click Interval    0 ms
+    Set White Log Level    Info
 
