@@ -4,7 +4,7 @@
 Library    OperatingSystem
 Library    String
 Library    WhiteLibrary
-Resource          ..${/}resource.robot
+Resource    ../resource.robot
 
 *** Test Cases ***
 DragDrop Scenarios

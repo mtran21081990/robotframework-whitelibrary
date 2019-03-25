@@ -8,7 +8,7 @@ from TestStack.White.Configuration import CoreAppXmlConfiguration, WhiteDefaultL
 
 class WhiteConfigurationKeywords(LibraryComponent):
     @keyword
-    def set_white_log_level(self, level):
+    def set_white_log_level(self, level):  # pylint: disable=no-self-use
         """Sets log level for White's console log.
 
         Valid ``level`` values are ``INFO``, ``WARN`` and ``DEBUG`` (case insensitive).
