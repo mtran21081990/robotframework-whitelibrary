@@ -6,6 +6,8 @@ import clr
 DLL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin', 'TestStack.White.dll')
 clr.AddReference('System')
 clr.AddReference(DLL_PATH)
+from System import Console     # noqa: E402
+from System.IO import StringWriter    # noqa: E402
 from System.Windows.Automation import AutomationElement, ControlType    # noqa: E402
 from TestStack.White.UIItems.Finders import SearchCriteria    # noqa: E402
 from TestStack.White.UIItems import UIItem    # noqa: E402
@@ -147,6 +149,8 @@ class WhiteLibrary(DynamicCore):
                           WindowKeywords(self),
                           ScreenshotKeywords(self)]
         DynamicCore.__init__(self, self.libraries)
+        self.log_writer = StringWriter()
+        Console.SetOut(self.log_writer)
 
     def _get_typed_item_by_locator(self, item_type, locator):
         if isinstance(locator, UIItem):
@@ -205,6 +209,13 @@ class WhiteLibrary(DynamicCore):
         if attrs['status'] == 'FAIL':
             if self.screenshot_type == 'desktop' and self.screenshots_enabled:
                 self.screenshooter.take_desktop_screenshot()
+        for line in self.log_writer.ToString().splitlines():
+            if line.startswith("[Debug"):
+                logger.debug(line)
+            else:
+                logger.info(line)
+        sb = self.log_writer.GetStringBuilder()
+        sb.Remove(0, sb.Length)
 
     def _contains_string_value(self, expected, actual, case_sensitive=True):  # pylint: disable=no-self-use
         case_sensitive = is_truthy(case_sensitive)

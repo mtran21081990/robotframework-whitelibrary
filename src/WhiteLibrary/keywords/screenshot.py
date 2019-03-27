@@ -4,7 +4,6 @@ from robot.libraries.BuiltIn import BuiltIn, RobotNotRunningError
 from robot.utils import get_link_path, is_truthy
 from WhiteLibrary.keywords.librarycomponent import LibraryComponent
 from WhiteLibrary.keywords.robotlibcore import keyword, PY2
-
 from System.Drawing import Bitmap   # noqa: F401 #pylint: disable=unused-import
 from System.Drawing.Imaging import ImageFormat
 from TestStack.White import Desktop
