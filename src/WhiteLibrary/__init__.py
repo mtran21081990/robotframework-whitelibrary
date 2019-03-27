@@ -2,13 +2,16 @@
 import os
 from robot.api import logger    # noqa: F401 #pylint: disable=unused-import
 from robot.utils import is_truthy
+from robot.libraries.BuiltIn import BuiltIn
 import clr
 DLL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin', 'TestStack.White.dll')
 clr.AddReference('System')
 clr.AddReference(DLL_PATH)
+from Castle.Core.Logging import LoggerLevel    # noqa: E402
 from System import Console     # noqa: E402
 from System.IO import StringWriter    # noqa: E402
 from System.Windows.Automation import AutomationElement, ControlType    # noqa: E402
+from TestStack.White.Configuration import CoreAppXmlConfiguration, WhiteDefaultLoggerFactory    # noqa: E402
 from TestStack.White.UIItems.Finders import SearchCriteria    # noqa: E402
 from TestStack.White.UIItems import UIItem    # noqa: E402
 from WhiteLibrary.keywords import ApplicationKeywords, KeyboardKeywords, MouseKeywords, ScreenshotKeywords, WhiteConfigurationKeywords, WindowKeywords    # noqa: E402
@@ -204,6 +207,13 @@ class WhiteLibrary(DynamicCore):
         if ":" not in locator:
             return locator.index("=")
         return min(locator.index(":"), locator.index("="))
+
+    def _start_keyword(self, name, attrs):  # pylint: disable=unused-argument
+        log_lvl = BuiltIn().get_variable_value("${LOG_LEVEL}")
+        if log_lvl == "TRACE" or log_lvl == "DEBUG":
+            CoreAppXmlConfiguration.Instance.LoggerFactory = WhiteDefaultLoggerFactory(LoggerLevel.Debug)
+        else:
+            CoreAppXmlConfiguration.Instance.LoggerFactory = WhiteDefaultLoggerFactory(LoggerLevel.Info)
 
     def _end_keyword(self, name, attrs):  # pylint: disable=unused-argument
         if attrs['status'] == 'FAIL':
