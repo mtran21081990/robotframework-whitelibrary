@@ -1,20 +1,14 @@
 # pylint: disable=invalid-name
-import os
-import re
-from robot.api import logger    # noqa: F401 #pylint: disable=unused-import
-from robot.utils import is_truthy
-from robot.libraries.BuiltIn import BuiltIn
 import clr
+import os
+from robot.utils import is_truthy
 DLL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin', 'TestStack.White.dll')
 clr.AddReference('System')
 clr.AddReference(DLL_PATH)
-from Castle.Core.Logging import LoggerLevel    # noqa: E402
-from System import Console     # noqa: E402
-from System.IO import StringWriter    # noqa: E402
 from System.Windows.Automation import AutomationElement, ControlType    # noqa: E402
-from TestStack.White.Configuration import CoreAppXmlConfiguration, WhiteDefaultLoggerFactory    # noqa: E402
 from TestStack.White.UIItems.Finders import SearchCriteria    # noqa: E402
 from TestStack.White.UIItems import UIItem    # noqa: E402
+from WhiteLibrary.utils.logging import LogWriter, update_white_log_level    # noqa: E402
 from WhiteLibrary.keywords import ApplicationKeywords, KeyboardKeywords, MouseKeywords, ScreenshotKeywords, WhiteConfigurationKeywords, WindowKeywords    # noqa: E402
 from WhiteLibrary.keywords.items import (ButtonKeywords,
                                          LabelKeywords,
@@ -132,9 +126,9 @@ class WhiteLibrary(DynamicCore):
         self.app = None
         self.window = None
         self.screenshooter = None
-        self.ROBOT_LIBRARY_LISTENER = self  # pylint: disable=invalid-name
-        self.screenshot_type = 'desktop'
         self.screenshots_enabled = True
+        self.log_writer = LogWriter()
+        self.ROBOT_LIBRARY_LISTENER = self  # pylint: disable=invalid-name
         self.libraries = [ApplicationKeywords(self),
                           ButtonKeywords(self),
                           KeyboardKeywords(self),
@@ -153,8 +147,15 @@ class WhiteLibrary(DynamicCore):
                           WindowKeywords(self),
                           ScreenshotKeywords(self)]
         DynamicCore.__init__(self, self.libraries)
-        self.log_writer = StringWriter()
-        Console.SetOut(self.log_writer)
+
+    def start_keyword(self, name, attrs):  # pylint: disable=unused-argument, no-self-use
+        update_white_log_level()
+
+    def end_keyword(self, name, attrs):  # pylint: disable=unused-argument
+        if attrs['status'] == 'FAIL':
+            if self.screenshots_enabled:
+                self.screenshooter.take_desktop_screenshot()
+        self.log_writer.log_white_messages()
 
     def _get_typed_item_by_locator(self, item_type, locator):
         if isinstance(locator, UIItem):
@@ -208,29 +209,6 @@ class WhiteLibrary(DynamicCore):
         if ":" not in locator:
             return locator.index("=")
         return min(locator.index(":"), locator.index("="))
-
-    def _start_keyword(self, name, attrs):  # pylint: disable=unused-argument
-        log_lvl = BuiltIn().get_variable_value("${LOG_LEVEL}")
-        if log_lvl == "TRACE" or log_lvl == "DEBUG":
-            CoreAppXmlConfiguration.Instance.LoggerFactory = WhiteDefaultLoggerFactory(LoggerLevel.Debug)
-        else:
-            CoreAppXmlConfiguration.Instance.LoggerFactory = WhiteDefaultLoggerFactory(LoggerLevel.Info)
-
-    def _end_keyword(self, name, attrs):  # pylint: disable=unused-argument
-        if attrs['status'] == 'FAIL':
-            if self.screenshot_type == 'desktop' and self.screenshots_enabled:
-                self.screenshooter.take_desktop_screenshot()
-        self._write_log()
-
-    def _write_log(self):
-        messages = self.log_writer.ToString()
-        for line in re.findall(r"(\[\w+\s-\s.+?\].*)", messages):
-            if line.startswith("[Debug"):
-                logger.debug(line)
-            else:
-                logger.info(line)
-        sb = self.log_writer.GetStringBuilder()
-        sb.Remove(0, sb.Length)
 
     def _contains_string_value(self, expected, actual, case_sensitive=True):  # pylint: disable=no-self-use
         case_sensitive = is_truthy(case_sensitive)
