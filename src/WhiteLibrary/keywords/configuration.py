@@ -2,29 +2,10 @@ from robot.api import logger
 from robot.utils import timestr_to_secs
 from WhiteLibrary.keywords.librarycomponent import LibraryComponent
 from WhiteLibrary.keywords.robotlibcore import keyword
-from Castle.Core.Logging import LoggerLevel
-from TestStack.White.Configuration import CoreAppXmlConfiguration, WhiteDefaultLoggerFactory
+from TestStack.White.Configuration import CoreAppXmlConfiguration
 
 
 class WhiteConfigurationKeywords(LibraryComponent):
-    @keyword
-    def set_white_log_level(self, level):  # pylint: disable=no-self-use
-        """Sets log level for White's console log.
-
-        Valid ``level`` values are ``INFO``, ``WARN`` and ``DEBUG``.
-        The value is case insensitive.
-        Default log level is ``INFO``.
-        """
-        level = level.upper()
-        if level == "INFO":
-            CoreAppXmlConfiguration.Instance.LoggerFactory = WhiteDefaultLoggerFactory(LoggerLevel.Info)
-        elif level == "WARN":
-            CoreAppXmlConfiguration.Instance.LoggerFactory = WhiteDefaultLoggerFactory(LoggerLevel.Warn)
-        elif level == "DEBUG":
-            CoreAppXmlConfiguration.Instance.LoggerFactory = WhiteDefaultLoggerFactory(LoggerLevel.Debug)
-        else:
-            raise ValueError("Invalid log level: '{}'".format(level))
-
     @keyword
     def set_white_busy_timeout(self, timeout):
         """Sets BusyTimeout for White and returns original value.

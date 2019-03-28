@@ -1,5 +1,6 @@
 # pylint: disable=invalid-name
 import os
+import re
 from robot.api import logger    # noqa: F401 #pylint: disable=unused-import
 from robot.utils import is_truthy
 from robot.libraries.BuiltIn import BuiltIn
@@ -219,7 +220,11 @@ class WhiteLibrary(DynamicCore):
         if attrs['status'] == 'FAIL':
             if self.screenshot_type == 'desktop' and self.screenshots_enabled:
                 self.screenshooter.take_desktop_screenshot()
-        for line in self.log_writer.ToString().splitlines():
+        self._write_log()
+
+    def _write_log(self):
+        messages = self.log_writer.ToString()
+        for line in re.findall(r"(\[\w+\s-\s.+?\].*)", messages):
             if line.startswith("[Debug"):
                 logger.debug(line)
             else:
