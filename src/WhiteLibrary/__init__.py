@@ -33,7 +33,6 @@ STRATEGIES = dict(id={"method": "ByAutomationId"},  # noqa: C408
                   class_name={"method": "ByClassName"},
                   control_type={"method": "ByControlType"})
 
-
 class WhiteLibrary(DynamicCore):
     """WhiteLibrary is a Robot Framework library for automating Windows GUI.
 
